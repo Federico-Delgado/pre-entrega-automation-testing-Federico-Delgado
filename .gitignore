@@ -1,0 +1,35 @@
+# Carpetas y archivos generados por Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+ENV/
+
+# Caché de Pytest
+.pytest_cache/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Drivers descargados localmente
+chromedriver
+chromedriver.exe
+geckodriver
+geckodriver.exe
+msedgedriver
+msedgedriver.exe
+*.zip
+
+# Variables de entorno locales
+.env
+
+# IDEs
+.vscode/
+.idea/
