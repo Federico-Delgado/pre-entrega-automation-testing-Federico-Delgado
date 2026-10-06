@@ -83,7 +83,7 @@ standard_user
 secret_sauce
 ```
 
-## Estado actual
+## Etapa 1: Creacion de la estructura del proyecto
 
 Este repositorio corresponde a la Etapa 1 de la pre-entrega.
 Se encuentra configurada:
@@ -95,9 +95,99 @@ Se encuentra configurada:
 - Archivo de tests inicial.
 - Módulo de utilidades auxiliares.
 
-Próximas etapas:
+## Etapa 2: Implementación del login con Selenium y esperas explícitas
 
-- **Etapa 2:** implementación del login con Selenium y esperas explícitas.
-- **Etapa 3:** verificación del catálogo.
-- **Etapa 4:** interacción con carrito de compras.
-- **Etapa 5:** reporte HTML, capturas de evidencia y README final.
+### Qué valida
+
+- Que se pueda navegar correctamente a la página de login de SauceDemo.
+- Que el formulario de login cargue utilizando esperas explícitas.
+- Que se puedan ingresar credenciales válidas:
+  - Usuario: `standard_user`
+  - Contraseña: `secret_sauce`
+- Que al hacer clic en el botón de login se produzca una redirección válida.
+- Que la URL final contenga `/inventory.html`.
+- Que el título de la página sea `Swag Labs`.
+- Que el encabezado del catálogo muestre el texto `Products`.
+
+### Ejecutar por marcador
+
+Ejecutar únicamente la prueba de login:
+
+```bash
+pytest -m login -v
+```
+
+Ejecutar la prueba de login como parte del conjunto de pruebas críticas:
+
+```bash
+pytest -m smoke -v
+```
+
+### Generar reporte HTML de la Etapa 2
+
+Generar el reporte HTML con los resultados del test de login:
+
+```bash
+pytest tests/test_saucedemo.py::test_login_exitoso -v --html=reports/reporte_etapa2.html --self-contained-html
+```
+
+## Etapa 3: Navegación y verificación del catálogo
+
+En esta etapa se implementó el caso de prueba `test_verificar_catalogo`.
+
+### Qué valida
+
+- Que luego del login se llegue correctamente a `/inventory.html`.
+- Que el título del navegador sea `Swag Labs`.
+- Que el encabezado visible de la página sea `Products`.
+- Que existan productos
+
+### Ejecutar por marcador
+
+Ejecutar únicamente la prueba de catalogo:
+
+```bash
+pytest -m catalogo -v
+```
+
+Ejecutar tanto la prueba de login como la de catalogo como parte del conjunto de pruebas críticas:
+
+```bash
+pytest -m smoke -v
+```
+
+### Generar reporte HTML de la Etapa 3
+
+```bash
+pytest tests/test_saucedemo.py -v --html=reports/reporte_etapa3.html --self-contained-html
+```
+
+## Estado actual
+
+El proyecto avanza por etapas.
+
+### Etapa 1: completada
+- Creación del repositorio.
+- Estructura inicial de carpetas.
+- Configuración de Pytest.
+- Dependencias básicas.
+- Archivo de utilidades inicial.
+
+### Etapa 2: completada
+- Automatización del login exitoso.
+- Uso de Selenium WebDriver.
+- Esperas explícitas con WebDriverWait y expected_conditions.
+- Fixture de navegador.
+- Logs de ejecución.
+- Captura automática en caso de fallo.
+
+### Etapa 3: completada
+- Verificación del catálogo.
+- Validación de título.
+- Validación de presencia de productos.
+- Lectura de nombre y precio del primer producto.
+- Validación de elementos clave de interfaz.
+
+### Próximas etapas
+- Etapa 4: interacción con productos y carrito.
+- Etapa 5: reporte final, evidencias y README definitivo.

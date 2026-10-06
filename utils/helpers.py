@@ -3,14 +3,20 @@ Funciones auxiliares reutilizables para el proyecto de pre-entrega.
 
 Este módulo contiene:
 - constantes del sitio SauceDemo,
+- selectores reutilizables,
 - rutas base del proyecto,
 - utilidades para crear carpetas,
 - sanitización de nombres de archivo,
-- captura de pantalla en caso de fallos.
+- captura de pantalla en caso de fallos,
+- funciones auxiliares para login y catálogo.
 """
 
 import os
 from datetime import datetime
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 # Carpeta base del proyecto.
@@ -36,7 +42,31 @@ DEFAULT_TIMEOUT = 10
 
 
 # ================================
-# Funciones auxiliares
+# Selectores reutilizables
+# ================================
+
+SELECTORS = {
+    # Login
+    "username_input": (By.ID, "user-name"),
+    "password_input": (By.ID, "password"),
+    "login_button": (By.ID, "login-button"),
+
+    # Catálogo / inventario
+    "products_title": (By.CSS_SELECTOR, "div.header_secondary_container .title"),
+    "burger_menu_button": (By.ID, "react-burger-menu-btn"),
+    "product_sort_container": (By.CSS_SELECTOR, "select.product_sort_container"),
+    "shopping_cart_link": (By.CSS_SELECTOR, ".shopping_cart_link"),
+
+    # Productos
+    "inventory_items": (By.CLASS_NAME, "inventory_item"),
+    "first_inventory_item": (By.CSS_SELECTOR, "div.inventory_item"),
+    "product_name": (By.CLASS_NAME, "inventory_item_name"),
+    "product_price": (By.CLASS_NAME, "inventory_item_price"),
+}
+
+
+# ================================
+# Funciones auxiliares generales
 # ================================
 
 
@@ -88,3 +118,128 @@ def take_screenshot(driver, test_name, directory=None):
     except Exception as error:
         print(f"No se pudo guardar la captura '{filename}': {error}")
         return None
+
+
+# ================================
+# Funciones auxiliares para Selenium
+# ================================
+
+
+def _wait(driver, timeout=None):
+    """
+    Devuelve una instancia de WebDriverWait con el timeout configurado.
+
+    Si no se pasa timeout, usa DEFAULT_TIMEOUT.
+    """
+    return WebDriverWait(driver, timeout or DEFAULT_TIMEOUT)
+
+
+def login_standard_user(driver, username=USERNAME, password=PASSWORD):
+    """
+    Realiza el login en SauceDemo con un usuario válido.
+
+    Esta función centraliza el flujo de login para que pueda ser reutilizado
+    por distintos tests, manteniendo los casos independientes entre sí.
+
+    Args:
+        driver: instancia de Selenium WebDriver.
+        username: usuario a ingresar. Por defecto, standard_user.
+        password: contraseña a ingresar. Por defecto, secret_sauce.
+
+    Returns:
+        La misma instancia del driver, ya posicionada en /inventory.html.
+    """
+    wait = _wait(driver)
+
+    driver.get(BASE_URL)
+
+    username_input = wait.until(
+        EC.visibility_of_element_located(SELECTORS["username_input"])
+    )
+    username_input.clear()
+    username_input.send_keys(username)
+
+    password_input = wait.until(
+        EC.visibility_of_element_located(SELECTORS["password_input"])
+    )
+    password_input.clear()
+    password_input.send_keys(password)
+
+    login_button = wait.until(
+        EC.element_to_be_clickable(SELECTORS["login_button"])
+    )
+    login_button.click()
+
+    wait.until(EC.url_contains(EXPECTED_INVENTORY_PATH))
+
+    # Nos aseguramos de que el catálogo ya esté visible antes de devolver el driver.
+    wait.until(
+        EC.visibility_of_element_located(SELECTORS["products_title"])
+    )
+
+    return driver
+
+
+def obtener_primer_producto(driver):
+    """
+    Obtiene el nombre y precio del primer producto visible en el catálogo.
+
+    Args:
+        driver: instancia de Selenium WebDriver posicionada en /inventory.html.
+
+    Returns:
+        Diccionario con la estructura:
+        {
+            "nombre": "...",
+            "precio": "..."
+        }
+    """
+    wait = _wait(driver)
+
+    first_item = wait.until(
+        EC.visibility_of_element_located(SELECTORS["first_inventory_item"])
+    )
+
+    name_element = first_item.find_element(*SELECTORS["product_name"])
+    price_element = first_item.find_element(*SELECTORS["product_price"])
+
+    return {
+        "nombre": name_element.text.strip(),
+        "precio": price_element.text.strip(),
+    }
+
+
+def esperar_elementos_clave_catalogo(driver):
+    """
+    Espera y devuelve elementos importantes de la interfaz del catálogo.
+
+    Valida visualmente:
+    - botón de menú hamburguesa,
+    - filtro/orden de productos,
+    - ícono del carrito.
+
+    Args:
+        driver: instancia de Selenium WebDriver posicionada en /inventory.html.
+
+    Returns:
+        Diccionario con los elementos Web encontrados.
+    """
+    wait = _wait(driver)
+
+    burger_menu = wait.until(
+        EC.visibility_of_element_located(SELECTORS["burger_menu_button"])
+    )
+
+    product_sort = wait.until(
+        EC.visibility_of_element_located(SELECTORS["product_sort_container"])
+    )
+
+    shopping_cart = wait.until(
+        EC.visibility_of_element_located(SELECTORS["shopping_cart_link"])
+    )
+
+    return {
+        "menu": burger_menu,
+        "filtro": product_sort,
+        "carrito": shopping_cart,
+    }
