@@ -1,27 +1,50 @@
 # Pre-Entrega Automation Testing - SauceDemo
 
-Proyecto de automatización de pruebas web utilizando Python, Pytest y Selenium WebDriver.
+Proyecto de automatización de pruebas web utilizando **Python**, **Pytest** y **Selenium WebDriver**.
 
 El sitio de prueba es:
 
 https://www.saucedemo.com/
 
+---
+
 ## Propósito del proyecto
 
-Automatizar flujos básicos de navegación web en SauceDemo, contemplando:
+El objetivo de este proyecto es automatizar flujos básicos de navegación web en SauceDemo, aplicando buenas prácticas de testing automatizado.
 
-1. Login exitoso.
-2. Navegación y verificación del catálogo.
-3. Interacción con productos y carrito de compras.
+Se automatizan tres funcionalidades principales:
+
+1. **Login exitoso**
+2. **Navegación y verificación del catálogo**
+3. **Interacción con productos y carrito de compras**
+
+El proyecto demuestra el uso de:
+
+- Selenium WebDriver;
+- Pytest;
+- esperas explícitas;
+- fixtures;
+- markers;
+- funciones auxiliares reutilizables;
+- generación de reporte HTML;
+- logs de ejecución;
+- capturas automáticas en caso de fallo;
+- control de versiones con Git y GitHub.
+
+---
 
 ## Tecnologías utilizadas
 
-- Python
+- Python 3.11
 - Pytest
 - Selenium WebDriver
 - pytest-html
 - Git
 - GitHub
+- Visual Studio Code
+- Git Bash
+
+---
 
 ## Estructura del proyecto
 
@@ -29,31 +52,112 @@ Automatizar flujos básicos de navegación web en SauceDemo, contemplando:
 pre-entrega-automation-testing-[nombre-apellido]/
 │
 ├── data/
+│   └── .gitkeep
+│
 ├── reports/
+│   ├── .gitkeep
+│   ├── reporte.html
+│   ├── pytest.log
+│   └── evidencia_captura_fallo.png
+│
 ├── tests/
 │   ├── __init__.py
 │   └── test_saucedemo.py
+│
 ├── utils/
 │   ├── __init__.py
 │   └── helpers.py
+│
 ├── .gitignore
+├── conftest.py
 ├── pytest.ini
 ├── README.md
 └── requirements.txt
 ```
 
-## Instalación de dependencias
+### Descripción de carpetas y archivos
 
-Se recomienda trabajar con un entorno virtual para aislar las dependencias del proyecto.
+| Ruta | Descripción |
+|---|---|
+| `tests/` | Contiene los casos de prueba automatizados. |
+| `utils/` | Contiene funciones auxiliares reutilizables. |
+| `data/` | Carpeta reservada para datos externos, si aplican. |
+| `reports/` | Contiene reporte HTML, logs y capturas de evidencia. |
+| `conftest.py` | Configuración global de Pytest, fixture de navegador y hook de captura automática. |
+| `pytest.ini` | Configuración de Pytest, markers y logs. |
+| `requirements.txt` | Dependencias del proyecto. |
+| `README.md` | Documentación del proyecto. |
 
-Con python 3.11 y Git Bash en VS Code. Desde la raíz del proyecto:
+---
+
+## Requisitos previos
+
+Se recomienda tener instalado:
+
+- Python 3.11
+- Google Chrome
+- Git
+- Visual Studio Code
+
+---
+
+## Instalación del entorno virtual
+
+Este proyecto utiliza un entorno virtual para aislar las dependencias.
+
+Desde la raíz del proyecto, en Git Bash:
 
 ```bash
 py -3.11 -m venv .venv
+```
+
+Activar el entorno virtual:
+
+```bash
 source .venv/Scripts/activate
+```
+
+Actualizar herramientas básicas de Python:
+
+```bash
 python -m pip install --upgrade pip setuptools wheel
+```
+
+Instalar dependencias:
+
+```bash
 pip install -r requirements.txt
 ```
+
+---
+
+## Dependencias del proyecto
+
+El archivo `requirements.txt` incluye:
+
+```txt
+selenium>=4.20.0
+pytest>=8.0.0
+pytest-html>=4.1.0
+```
+
+---
+
+## Credenciales de prueba
+
+Usuario:
+
+```text
+standard_user
+```
+
+Contraseña:
+
+```text
+secret_sauce
+```
+
+---
 
 ## Ejecución de pruebas
 
@@ -63,157 +167,267 @@ Ejecutar todos los tests:
 pytest -v
 ```
 
-Ejecutar generando reporte HTML:
+Ejecutar solo el archivo de tests de SauceDemo:
 
 ```bash
-pytest tests/test_saucedemo.py -v --html=reports/reporte.html --self-contained-html
+pytest tests/test_saucedemo.py -v
 ```
 
-## Credenciales de prueba
-
-- **Usuario:**
-
-```text
-standard_user
-```
-
-- **Contraseña:**
-
-```text
-secret_sauce
-```
-
-## Etapa 1: Creacion de la estructura del proyecto
-
-Este repositorio corresponde a la Etapa 1 de la pre-entrega.
-Se encuentra configurada:
-
-- Estructura de carpetas.
-- Archivo README.md.
-- Configuración de Pytest.
-- Dependencias básicas.
-- Archivo de tests inicial.
-- Módulo de utilidades auxiliares.
-
-## Etapa 2: Implementación del login con Selenium y esperas explícitas
-
-### Qué valida
-
-- Que se pueda navegar correctamente a la página de login de SauceDemo.
-- Que el formulario de login cargue utilizando esperas explícitas.
-- Que se puedan ingresar credenciales válidas:
-  - Usuario: `standard_user`
-  - Contraseña: `secret_sauce`
-- Que al hacer clic en el botón de login se produzca una redirección válida.
-- Que la URL final contenga `/inventory.html`.
-- Que el título de la página sea `Swag Labs`.
-- Que el encabezado del catálogo muestre el texto `Products`.
-
-### Ejecutar por marcador
-
-Ejecutar únicamente la prueba de login:
+Ejecutar solo el test de login:
 
 ```bash
-pytest -m login -v
+pytest tests/test_saucedemo.py::test_login_exitoso -v
 ```
 
-### Generar reporte HTML de la Etapa 2
-
-Generar el reporte HTML con los resultados del test de login:
+Ejecutar solo el test de catálogo:
 
 ```bash
-pytest tests/test_saucedemo.py::test_login_exitoso -v --html=reports/reporte_etapa2.html --self-contained-html
+pytest tests/test_saucedemo.py::test_verificar_catalogo -v
 ```
 
-## Etapa 3: Navegación y verificación del catálogo
-
-En esta etapa se implementó el caso de prueba `test_verificar_catalogo`.
-
-### Qué valida
-
-- Que luego del login se llegue correctamente a `/inventory.html`.
-- Que el título del navegador sea `Swag Labs`.
-- Que el encabezado visible de la página sea `Products`.
-- Que existan productos
-
-### Ejecutar por marcador
-
-Ejecutar únicamente la prueba de catalogo:
-
-```bash
-pytest -m catalogo -v
-```
-
-### Generar reporte HTML de la Etapa 3
-
-```bash
-pytest tests/test_saucedemo.py -v --html=reports/reporte_etapa3.html --self-contained-html
-```
-
-## Etapa 4: Interacción con productos y carrito de compras
-
-### Qué valida
-
-- Que se pueda iniciar sesión correctamente en SauceDemo.
-- Que se pueda leer el nombre y precio del primer producto del catálogo.
-- Que se pueda agregar el primer producto al carrito haciendo clic en el botón correspondiente.
-- Que el contador del carrito se incremente correctamente y muestre `1`.
-- Que se pueda navegar al carrito de compras.
-- Que la URL del carrito contenga `/cart.html`.
-- Que el producto agregado aparezca correctamente listado en el carrito.
-- Que el nombre y precio del producto en el carrito coincidan con los del catálogo.
-
-### Ejecutar solo el test de carrito
+Ejecutar solo el test de carrito:
 
 ```bash
 pytest tests/test_saucedemo.py::test_interaccion_con_producto_y_carrito -v
 ```
 
-### Ejecutar por marcador
+---
+
+## Ejecución por markers
+
+El proyecto utiliza markers personalizados de Pytest.
+
+Ejecutar tests de login:
+
+```bash
+pytest -m login -v
+```
+
+Ejecutar tests de catálogo:
+
+```bash
+pytest -m catalogo -v
+```
+
+Ejecutar tests de carrito:
 
 ```bash
 pytest -m carrito -v
 ```
 
-### Generar reporte HTML de la Etapa 4
+Ejecutar tests smoke:
 
 ```bash
-pytest tests/test_saucedemo.py -v --html=reports/reporte_etapa4.html --self-contained-html
+pytest -m smoke -v
 ```
 
-## Estado actual
+---
 
-El proyecto avanza por etapas.
+## Generación de reporte HTML
 
-### Etapa 1: completada
-- Creación del repositorio.
-- Estructura inicial de carpetas.
-- Configuración de Pytest.
-- Dependencias básicas.
-- Archivo de utilidades inicial.
+Para generar el reporte HTML final:
 
-### Etapa 2: completada
-- Automatización del login exitoso.
-- Uso de Selenium WebDriver.
-- Esperas explícitas con WebDriverWait y expected_conditions.
-- Fixture de navegador.
-- Logs de ejecución.
-- Captura automática en caso de fallo.
+```bash
+pytest tests/test_saucedemo.py -v --html=reports/reporte.html --self-contained-html
+```
 
-### Etapa 3: completada
-- Verificación del catálogo.
-- Validación de título.
-- Validación de presencia de productos.
-- Lectura de nombre y precio del primer producto.
-- Validación de elementos clave de interfaz.
+El reporte se genera en:
 
-### Etapa 4: completada
-- Interacción con productos.
-- Agregado del primer producto al carrito.
-- Validación del contador del carrito.
-- Navegación al carrito de compras.
-- Verificación del producto agregado en el carrito.
-- Comparación de nombre y precio entre catálogo y carrito.
+```text
+reports/reporte.html
+```
 
-### Próximas etapas
-- Etapa 5: reporte final, evidencias, limpieza y README definitivo.
+---
+
+## Logs de ejecución
+
+El archivo `pytest.ini` configura la generación de logs en:
+
+```text
+reports/pytest.log
+```
+
+Este archivo contiene el registro de ejecución de los tests y sirve como evidencia adicional.
+
+---
+
+## Capturas automáticas en caso de fallo
+
+El archivo `conftest.py` implementa un hook de Pytest que guarda una captura de pantalla automáticamente cuando un test falla.
+
+Las capturas se guardan en:
+
+```text
+reports/
+```
+
+Como evidencia del funcionamiento de esta característica, se incluye el archivo:
+
+```text
+reports/evidencia_captura_fallo.png
+```
+
+Esta captura fue generada mediante un test controlado que falló a propósito para validar el mecanismo automático de captura.
+
+---
+
+## Casos de prueba automatizados
+
+### 1. Login exitoso
+
+Archivo:
+
+```text
+tests/test_saucedemo.py
+```
+
+Test:
+
+```python
+test_login_exitoso
+```
+
+Valida:
+
+- navegación a `https://www.saucedemo.com/`;
+- ingreso de usuario `standard_user`;
+- ingreso de contraseña `secret_sauce`;
+- clic en botón de login;
+- espera explícita por redirección;
+- validación de URL `/inventory.html`;
+- validación de título `Swag Labs`;
+- validación de encabezado `Products`.
+
+Marker:
+
+```bash
+pytest -m login -v
+```
+
+---
+
+### 2. Navegación y verificación del catálogo
+
+Test:
+
+```python
+test_verificar_catalogo
+```
+
+Valida:
+
+- título de la página `Swag Labs`;
+- encabezado visible `Products`;
+- presencia de productos visibles;
+- lectura del nombre del primer producto;
+- lectura del precio del primer producto;
+- presencia de elementos clave de interfaz:
+  - menú hamburguesa;
+  - filtro/orden de productos;
+  - ícono del carrito.
+
+Marker:
+
+```bash
+pytest -m catalogo -v
+```
+
+---
+
+### 3. Interacción con productos y carrito
+
+Test:
+
+```python
+test_interaccion_con_producto_y_carrito
+```
+
+Valida:
+
+- login previo;
+- lectura del primer producto del catálogo;
+- clic en botón `Add to cart`;
+- incremento del contador del carrito a `1`;
+- navegación al carrito;
+- validación de URL `/cart.html`;
+- presencia del producto en el carrito;
+- comparación de nombre y precio entre catálogo y carrito.
+
+Marker:
+
+```bash
+pytest -m carrito -v
+```
+
+---
+
+## Independencia de los tests
+
+Cada test utiliza el fixture `driver` con scope `function`.
+
+Esto significa que cada test:
+
+- abre un navegador nuevo;
+- ejecuta su propio flujo;
+- cierra el navegador al finalizar.
+
+Por lo tanto, la falla de un test no afecta a los demás.
+
+---
+
+## Buenas prácticas aplicadas
+
+El proyecto aplica las siguientes buenas prácticas:
+
+- uso de entorno virtual;
+- separación entre tests y funciones auxiliares;
+- uso de constantes para URLs, credenciales y timeouts;
+- centralización de selectores;
+- uso de esperas explícitas con `WebDriverWait` y `expected_conditions`;
+- evitar `time.sleep()`;
+- tests independientes;
+- nombres descriptivos;
+- comentarios y docstrings;
+- logs de ejecución;
+- reporte HTML;
+- capturas automáticas en fallos;
+- commits descriptivos;
+- `.gitignore` para no subir artefactos innecesarios.
+
+---
+
+## Comandos útiles
+
+Verificar versión de Python:
+
+```bash
+python --version
+```
+
+Ver paquetes instalados:
+
+```bash
+pip list
+```
+
+Ejecutar todos los tests:
+
+```bash
+pytest -v
+```
+
+Ejecutar tests y generar reporte HTML:
+
+```bash
+pytest tests/test_saucedemo.py -v --html=reports/reporte.html --self-contained-html
+```
+
+---
+
+## Autor
+
+Proyecto desarrollado como pre-entrega del curso de Automatización QA.
+
+Sitio de prueba: SauceDemo.
+
+Herramientas principales: Python, Pytest y Selenium WebDriver.
