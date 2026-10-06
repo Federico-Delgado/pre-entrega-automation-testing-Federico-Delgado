@@ -1,9 +1,10 @@
 """
 Funciones auxiliares reutilizables para el proyecto de pre-entrega.
 
-Este módulo contiene utilidades que no pertenecen directamente a los tests,
-como por ejemplo:
-- creación de carpetas,
+Este módulo contiene:
+- constantes del sitio SauceDemo,
+- rutas base del proyecto,
+- utilidades para crear carpetas,
 - sanitización de nombres de archivo,
 - captura de pantalla en caso de fallos.
 """
@@ -15,8 +16,28 @@ from datetime import datetime
 # Carpeta base del proyecto.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Carpeta donde se guardarán reportes y capturas.
+# Carpeta donde se guardarán reportes, logs y capturas.
 REPORTS_DIR = os.path.join(BASE_DIR, "reports")
+
+
+# ================================
+# Constantes del sitio de prueba
+# ================================
+
+BASE_URL = "https://www.saucedemo.com/"
+
+USERNAME = "standard_user"
+PASSWORD = "secret_sauce"
+
+EXPECTED_INVENTORY_PATH = "/inventory.html"
+
+# Tiempo máximo en segundos para esperas explícitas.
+DEFAULT_TIMEOUT = 10
+
+
+# ================================
+# Funciones auxiliares
+# ================================
 
 
 def ensure_directory(directory):
