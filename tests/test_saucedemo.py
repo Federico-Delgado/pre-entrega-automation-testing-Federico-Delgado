@@ -7,13 +7,13 @@ Etapa 2:
 Etapa 3:
 - Navegación y verificación del catálogo.
 
+Etapa 4:
+- Interacción con productos y carrito de compras.
+
 Flujos automatizados:
 1. Login exitoso.
-2. Verificación del catálogo:
-   - título correcto,
-   - presencia de productos,
-   - nombre y precio del primer producto,
-   - elementos clave de interfaz.
+2. Verificación del catálogo.
+3. Agregado de producto al carrito y validación del carrito.
 """
 
 import logging
@@ -25,11 +25,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from utils.helpers import (
     DEFAULT_TIMEOUT,
+    EXPECTED_CART_PATH,
     EXPECTED_INVENTORY_PATH,
     SELECTORS,
+    agregar_primer_producto_al_carrito,
     esperar_elementos_clave_catalogo,
     login_standard_user,
+    obtener_contador_carrito,
+    obtener_producto_en_carrito,
     obtener_primer_producto,
+    navegar_al_carrito,
 )
 
 
@@ -178,3 +183,111 @@ def test_verificar_catalogo(driver):
     )
 
     logger.info("Catálogo validado correctamente.")
+
+
+@pytest.mark.carrito
+@pytest.mark.smoke
+def test_interaccion_con_producto_y_carrito(driver):
+    """
+    Caso de prueba: Interacción con productos y carrito de compras.
+
+    Valida que:
+    - se pueda agregar el primer producto al carrito;
+    - el contador del carrito se incremente a 1;
+    - se pueda navegar al carrito;
+    - el producto agregado aparezca correctamente en el carrito;
+    - el nombre y precio del producto en el carrito coincidan con los del catálogo.
+    """
+
+    logger.info("Iniciando prueba de interacción con producto y carrito.")
+
+    # Cada test es independiente: vuelve a hacer login desde cero.
+    login_standard_user(driver)
+
+    # ----------------------------------------------------
+    # 1. Agregar el primer producto al carrito
+    # ----------------------------------------------------
+
+    logger.info("Agregando el primer producto al carrito.")
+    producto_agregado = agregar_primer_producto_al_carrito(driver)
+
+    assert producto_agregado["nombre"] != "", (
+        "Se esperaba que el producto agregado tuviera un nombre visible."
+    )
+
+    assert producto_agregado["precio"] != "", (
+        "Se esperaba que el producto agregado tuviera un precio visible."
+    )
+
+    logger.info(
+        "Producto agregado desde catálogo -> nombre: %s | precio: %s",
+        producto_agregado["nombre"],
+        producto_agregado["precio"],
+    )
+
+    # ----------------------------------------------------
+    # 2. Verificar que el contador del carrito sea 1
+    # ----------------------------------------------------
+
+    logger.info("Validando contador del carrito.")
+    contador_carrito = obtener_contador_carrito(driver)
+
+    assert contador_carrito == "1", (
+        f"Se esperaba que el contador del carrito mostrara '1', "
+        f"pero mostró: {contador_carrito}"
+    )
+
+    logger.info("Contador del carrito validado correctamente: %s", contador_carrito)
+
+    # ----------------------------------------------------
+    # 3. Navegar al carrito de compras
+    # ----------------------------------------------------
+
+    logger.info("Navegando al carrito de compras.")
+    navegar_al_carrito(driver)
+
+    assert EXPECTED_CART_PATH in driver.current_url, (
+        f"Se esperaba que la URL contuviera '{EXPECTED_CART_PATH}', "
+        f"pero la URL actual es: {driver.current_url}"
+    )
+
+    logger.info("Redirección al carrito validada correctamente.")
+
+    # ----------------------------------------------------
+    # 4. Verificar que el producto agregado aparezca en el carrito
+    # ----------------------------------------------------
+
+    logger.info("Obteniendo producto listado en el carrito.")
+    producto_en_carrito = obtener_producto_en_carrito(driver)
+
+    assert producto_en_carrito["nombre"] != "", (
+        "Se esperaba que el carrito mostrara un producto con nombre visible."
+    )
+
+    assert producto_en_carrito["precio"] != "", (
+        "Se esperaba que el carrito mostrara un producto con precio visible."
+    )
+
+    logger.info(
+        "Producto en carrito -> nombre: %s | precio: %s",
+        producto_en_carrito["nombre"],
+        producto_en_carrito["precio"],
+    )
+
+    # ----------------------------------------------------
+    # 5. Validar que el producto del carrito sea el mismo agregado
+    # ----------------------------------------------------
+
+    assert producto_en_carrito["nombre"] == producto_agregado["nombre"], (
+        f"El nombre del producto en el carrito no coincide.\n"
+        f"Esperado: {producto_agregado['nombre']}\n"
+        f"Obtenido: {producto_en_carrito['nombre']}"
+    )
+
+    assert producto_en_carrito["precio"] == producto_agregado["precio"], (
+        f"El precio del producto en el carrito no coincide.\n"
+        f"Esperado: {producto_agregado['precio']}\n"
+        f"Obtenido: {producto_en_carrito['precio']}"
+    )
+
+    logger.info("Producto agregado y validado correctamente en el carrito.")

@@ -117,12 +117,6 @@ Ejecutar únicamente la prueba de login:
 pytest -m login -v
 ```
 
-Ejecutar la prueba de login como parte del conjunto de pruebas críticas:
-
-```bash
-pytest -m smoke -v
-```
-
 ### Generar reporte HTML de la Etapa 2
 
 Generar el reporte HTML con los resultados del test de login:
@@ -150,16 +144,41 @@ Ejecutar únicamente la prueba de catalogo:
 pytest -m catalogo -v
 ```
 
-Ejecutar tanto la prueba de login como la de catalogo como parte del conjunto de pruebas críticas:
-
-```bash
-pytest -m smoke -v
-```
-
 ### Generar reporte HTML de la Etapa 3
 
 ```bash
 pytest tests/test_saucedemo.py -v --html=reports/reporte_etapa3.html --self-contained-html
+```
+
+## Etapa 4: Interacción con productos y carrito de compras
+
+### Qué valida
+
+- Que se pueda iniciar sesión correctamente en SauceDemo.
+- Que se pueda leer el nombre y precio del primer producto del catálogo.
+- Que se pueda agregar el primer producto al carrito haciendo clic en el botón correspondiente.
+- Que el contador del carrito se incremente correctamente y muestre `1`.
+- Que se pueda navegar al carrito de compras.
+- Que la URL del carrito contenga `/cart.html`.
+- Que el producto agregado aparezca correctamente listado en el carrito.
+- Que el nombre y precio del producto en el carrito coincidan con los del catálogo.
+
+### Ejecutar solo el test de carrito
+
+```bash
+pytest tests/test_saucedemo.py::test_interaccion_con_producto_y_carrito -v
+```
+
+### Ejecutar por marcador
+
+```bash
+pytest -m carrito -v
+```
+
+### Generar reporte HTML de la Etapa 4
+
+```bash
+pytest tests/test_saucedemo.py -v --html=reports/reporte_etapa4.html --self-contained-html
 ```
 
 ## Estado actual
@@ -188,6 +207,13 @@ El proyecto avanza por etapas.
 - Lectura de nombre y precio del primer producto.
 - Validación de elementos clave de interfaz.
 
+### Etapa 4: completada
+- Interacción con productos.
+- Agregado del primer producto al carrito.
+- Validación del contador del carrito.
+- Navegación al carrito de compras.
+- Verificación del producto agregado en el carrito.
+- Comparación de nombre y precio entre catálogo y carrito.
+
 ### Próximas etapas
-- Etapa 4: interacción con productos y carrito.
-- Etapa 5: reporte final, evidencias y README definitivo.
+- Etapa 5: reporte final, evidencias, limpieza y README definitivo.

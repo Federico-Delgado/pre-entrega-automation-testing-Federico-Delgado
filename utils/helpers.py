@@ -8,7 +8,7 @@ Este módulo contiene:
 - utilidades para crear carpetas,
 - sanitización de nombres de archivo,
 - captura de pantalla en caso de fallos,
-- funciones auxiliares para login y catálogo.
+- funciones auxiliares para login, catálogo y carrito.
 """
 
 import os
@@ -36,6 +36,7 @@ USERNAME = "standard_user"
 PASSWORD = "secret_sauce"
 
 EXPECTED_INVENTORY_PATH = "/inventory.html"
+EXPECTED_CART_PATH = "/cart.html"
 
 # Tiempo máximo en segundos para esperas explícitas.
 DEFAULT_TIMEOUT = 10
@@ -55,13 +56,21 @@ SELECTORS = {
     "products_title": (By.CSS_SELECTOR, "div.header_secondary_container .title"),
     "burger_menu_button": (By.ID, "react-burger-menu-btn"),
     "product_sort_container": (By.CSS_SELECTOR, "select.product_sort_container"),
-    "shopping_cart_link": (By.CSS_SELECTOR, ".shopping_cart_link"),
+    "shopping_cart_link": (By.CSS_SELECTOR, "a.shopping_cart_link"),
 
     # Productos
     "inventory_items": (By.CLASS_NAME, "inventory_item"),
     "first_inventory_item": (By.CSS_SELECTOR, "div.inventory_item"),
     "product_name": (By.CLASS_NAME, "inventory_item_name"),
     "product_price": (By.CLASS_NAME, "inventory_item_price"),
+
+    # Carrito
+    "add_to_cart_button": (By.CSS_SELECTOR, "button[data-test^='add-to-cart']"),
+    "cart_badge": (By.CSS_SELECTOR, "span.shopping_cart_badge"),
+    "cart_items": (By.CLASS_NAME, "cart_item"),
+    "first_cart_item": (By.CSS_SELECTOR, "div.cart_item"),
+    "cart_item_name": (By.CLASS_NAME, "inventory_item_name"),
+    "cart_item_price": (By.CLASS_NAME, "inventory_item_price"),
 }
 
 
@@ -242,4 +251,104 @@ def esperar_elementos_clave_catalogo(driver):
         "menu": burger_menu,
         "filtro": product_sort,
         "carrito": shopping_cart,
+    }
+
+
+def agregar_primer_producto_al_carrito(driver):
+    """
+    Agrega el primer producto del catálogo al carrito de compras.
+
+    Antes de hacer clic, lee el nombre y precio del producto para poder
+    validarlo después dentro del carrito.
+
+    Args:
+        driver: instancia de Selenium WebDriver posicionada en /inventory.html.
+
+    Returns:
+        Diccionario con el nombre y precio del producto agregado.
+    """
+    wait = _wait(driver)
+
+    producto = obtener_primer_producto(driver)
+
+    add_to_cart_button = wait.until(
+        EC.element_to_be_clickable(SELECTORS["add_to_cart_button"])
+    )
+    add_to_cart_button.click()
+
+    return producto
+
+
+def obtener_contador_carrito(driver):
+    """
+    Obtiene el valor del contador del carrito de compras.
+
+    Args:
+        driver: instancia de Selenium WebDriver posicionada en /inventory.html.
+
+    Returns:
+        Texto del badge del carrito, por ejemplo: "1".
+    """
+    wait = _wait(driver)
+
+    cart_badge = wait.until(
+        EC.visibility_of_element_located(SELECTORS["cart_badge"])
+    )
+
+    return cart_badge.text.strip()
+
+
+def navegar_al_carrito(driver):
+    """
+    Hace clic en el ícono del carrito y espera a estar en la página /cart.html.
+
+    Args:
+        driver: instancia de Selenium WebDriver posicionada en /inventory.html.
+
+    Returns:
+        La misma instancia del driver, ya posicionada en /cart.html.
+    """
+    wait = _wait(driver)
+
+    shopping_cart_link = wait.until(
+        EC.element_to_be_clickable(SELECTORS["shopping_cart_link"])
+    )
+    shopping_cart_link.click()
+
+    wait.until(EC.url_contains(EXPECTED_CART_PATH))
+
+    # Esperamos a que al menos un item del carrito esté visible.
+    wait.until(
+        EC.visibility_of_element_located(SELECTORS["first_cart_item"])
+    )
+
+    return driver
+
+
+def obtener_producto_en_carrito(driver):
+    """
+    Obtiene el nombre y precio del primer producto listado en el carrito.
+
+    Args:
+        driver: instancia de Selenium WebDriver posicionada en /cart.html.
+
+    Returns:
+        Diccionario con la estructura:
+        {
+            "nombre": "...",
+            "precio": "..."
+        }
+    """
+    wait = _wait(driver)
+
+    first_cart_item = wait.until(
+        EC.visibility_of_element_located(SELECTORS["first_cart_item"])
+    )
+
+    name_element = first_cart_item.find_element(*SELECTORS["cart_item_name"])
+    price_element = first_cart_item.find_element(*SELECTORS["cart_item_price"])
+
+    return {
+        "nombre": name_element.text.strip(),
+        "precio": price_element.text.strip(),
     }
